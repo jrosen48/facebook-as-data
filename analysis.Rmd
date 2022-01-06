@@ -1,0 +1,237 @@
+---
+title: "Analysis"
+author: "Joshua Rosenberg"
+date: "1/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Manuscript: https://docs.google.com/document/d/1e-4-i-9DWPe90iT6N3Nsu6bdE7mcSqyua5xtswNuciE/edit
+
+## When did districts first post about the COVID-19 pandemic? To answer this question, we will first load and then prepare the data. Then, we will 
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+
+d_2019 <- read_csv("2022-01-06-14-52-49-EST-Historical-Report-100-largest-school-districts-2019-01-01--2020-01-01.csv", col_types = 
+                       cols(
+  `Page Name` = col_character(),
+  `User Name` = col_character(),
+  `Facebook Id` = col_double(),
+  `Page Category` = col_character(),
+  `Page Admin Top Country` = col_character(),
+  `Page Description` = col_character(),
+  `Page Created` = col_datetime(format = ""),
+  `Likes at Posting` = col_character(),
+  `Followers at Posting` = col_character(),
+  `Post Created` = col_character(),
+  `Post Created Date` = col_date(format = ""),
+  `Post Created Time` = col_time(format = ""),
+  Type = col_character(),
+  `Total Interactions` = col_number(),
+  Likes = col_double(),
+  Comments = col_double(),
+  Shares = col_double(),
+  Love = col_double(),
+  Wow = col_double(),
+  Haha = col_double(),
+  Sad = col_double(),
+  Angry = col_double(),
+  Care = col_double(),
+  `Video Share Status` = col_character(),
+  `Is Video Owner?` = col_character(),
+  `Post Views` = col_double(),
+  `Total Views` = col_double(),
+  `Total Views For All Crossposts` = col_double(),
+  `Video Length` = col_character(),
+  URL = col_character(),
+  Message = col_character(),
+  Link = col_character(),
+  `Final Link` = col_character(),
+  `Image Text` = col_character(),
+  `Link Text` = col_character(),
+  Description = col_character(),
+  `Sponsor Id` = col_logical(),
+  `Sponsor Name` = col_logical(),
+  `Sponsor Category` = col_logical(),
+  `Overperforming Score (weighted  —  Likes 1x Shares 1x Comments 1x Love 1x Wow 1x Haha 1x Sad 1x Angry 1x Care 1x )` = col_double()
+))
+
+d_2020 <- read_csv("2022-01-06-14-52-29-EST-Historical-Report-100-largest-school-districts-2020-01-01--2021-01-01.csv",
+                   col_types = 
+                       cols(
+  `Page Name` = col_character(),
+  `User Name` = col_character(),
+  `Facebook Id` = col_double(),
+  `Page Category` = col_character(),
+  `Page Admin Top Country` = col_character(),
+  `Page Description` = col_character(),
+  `Page Created` = col_datetime(format = ""),
+  `Likes at Posting` = col_character(),
+  `Followers at Posting` = col_character(),
+  `Post Created` = col_character(),
+  `Post Created Date` = col_date(format = ""),
+  `Post Created Time` = col_time(format = ""),
+  Type = col_character(),
+  `Total Interactions` = col_number(),
+  Likes = col_double(),
+  Comments = col_double(),
+  Shares = col_double(),
+  Love = col_double(),
+  Wow = col_double(),
+  Haha = col_double(),
+  Sad = col_double(),
+  Angry = col_double(),
+  Care = col_double(),
+  `Video Share Status` = col_character(),
+  `Is Video Owner?` = col_character(),
+  `Post Views` = col_double(),
+  `Total Views` = col_double(),
+  `Total Views For All Crossposts` = col_double(),
+  `Video Length` = col_character(),
+  URL = col_character(),
+  Message = col_character(),
+  Link = col_character(),
+  `Final Link` = col_character(),
+  `Image Text` = col_character(),
+  `Link Text` = col_character(),
+  Description = col_character(),
+  `Sponsor Id` = col_logical(),
+  `Sponsor Name` = col_logical(),
+  `Sponsor Category` = col_logical(),
+  `Overperforming Score (weighted  —  Likes 1x Shares 1x Comments 1x Love 1x Wow 1x Haha 1x Sad 1x Angry 1x Care 1x )` = col_double()
+))
+
+d_2021 <- read_csv("2022-01-06-14-52-56-EST-Historical-Report-100-largest-school-districts-2021-01-01--2022-01-01.csv",
+                   col_types = 
+                       cols(
+  `Page Name` = col_character(),
+  `User Name` = col_character(),
+  `Facebook Id` = col_double(),
+  `Page Category` = col_character(),
+  `Page Admin Top Country` = col_character(),
+  `Page Description` = col_character(),
+  `Page Created` = col_datetime(format = ""),
+  `Likes at Posting` = col_character(),
+  `Followers at Posting` = col_character(),
+  `Post Created` = col_character(),
+  `Post Created Date` = col_date(format = ""),
+  `Post Created Time` = col_time(format = ""),
+  Type = col_character(),
+  `Total Interactions` = col_number(),
+  Likes = col_double(),
+  Comments = col_double(),
+  Shares = col_double(),
+  Love = col_double(),
+  Wow = col_double(),
+  Haha = col_double(),
+  Sad = col_double(),
+  Angry = col_double(),
+  Care = col_double(),
+  `Video Share Status` = col_character(),
+  `Is Video Owner?` = col_character(),
+  `Post Views` = col_double(),
+  `Total Views` = col_double(),
+  `Total Views For All Crossposts` = col_double(),
+  `Video Length` = col_character(),
+  URL = col_character(),
+  Message = col_character(),
+  Link = col_character(),
+  `Final Link` = col_character(),
+  `Image Text` = col_character(),
+  `Link Text` = col_character(),
+  Description = col_character(),
+  `Sponsor Id` = col_logical(),
+  `Sponsor Name` = col_logical(),
+  `Sponsor Category` = col_logical(),
+  `Overperforming Score (weighted  —  Likes 1x Shares 1x Comments 1x Love 1x Wow 1x Haha 1x Sad 1x Angry 1x Care 1x )` = col_double()
+))
+
+d <- bind_rows(d_2019, d_2020, d_2021)
+
+d <- clean_names(d)
+```
+
+```{r}
+d <- d %>% 
+    mutate(mentions_covid = str_detect(message, regex("covid", ignore_case = TRUE)))
+
+d %>% 
+    mutate(date_rounded = round_date(post_created_date, "month")) %>% 
+    filter(!is.na(mentions_covid)) %>% 
+    mutate(mentions_covid = if_else(mentions_covid, "Yes", "No")) %>% 
+    count(date_rounded, mentions_covid) %>% 
+    ggplot(aes(x = date_rounded, y = n, group = mentions_covid, fill = mentions_covid)) +
+    geom_col() +
+    theme_bw() +
+    scale_fill_brewer("Mentions of COVID-19 in Districts' Posts", type = "qual") +
+    scale_y_continuous("Number of Posts", labels = scales::comma) +
+    scale_x_date(date_labels = "%b %y", date_breaks = "6 months") +
+    xlab("") +
+    theme(text = element_text(family = "Times", size = 14)) +
+    theme(legend.position = "top") +
+    theme(plot.margin = unit(c(1,1,1,1), "cm"))
+
+ggsave("mentions-of-covid.png", width = 7, height = 5)
+```
+
+## Which districts pages received the most interactions throughout 2021?
+
+```{r}
+total_interactions_by_district <- d %>% 
+    select(page_name, total_interactions) %>% 
+    group_by(page_name) %>% 
+    summarize(total_interactions_by_district = sum(total_interactions)) %>% 
+    arrange(desc(total_interactions_by_district))
+
+mean_interactions_by_district <- d %>% 
+    select(page_name, total_interactions) %>% 
+    group_by(page_name) %>% 
+    summarize(mean_interactions_by_district = mean(total_interactions)) %>% 
+    arrange(desc(mean_interactions_by_district))
+
+year_account_created <- d %>% 
+    select(page_name, page_created) %>% 
+    mutate(page_created = round_date(page_created, "year")) %>% 
+    distinct()
+
+max_followers <- d %>% 
+    select(page_name, followers_at_posting) %>% 
+    group_by(page_name) %>% 
+    filter(followers_at_posting != "N/A") %>% 
+    summarize(max_followers = max(followers_at_posting))
+
+t <- total_interactions_by_district %>% 
+    left_join(mean_interactions_by_district) %>% 
+    left_join(year_account_created) %>% 
+    left_join(max_followers) %>% 
+    arrange(desc(total_interactions_by_district))
+
+t %>% 
+    write_csv("table-of-district-statistics.csv")
+```
+
+```{r}
+d %>% 
+    select(likes:care, total_interactions) %>% 
+    summarize_all(list(mean = mean)) %>% 
+    gather(key, val) %>% 
+    arrange(desc(val))
+
+d %>% 
+    select(likes:care, post_created_date) %>% 
+    mutate(post_created_date = round_date(post_created_date, "month")) %>% 
+    group_by(post_created_date) %>% 
+    summarize_all(list(mean = mean)) %>% 
+    gather(key, val, -post_created_date) %>% 
+    ggplot(aes(x = post_created_date, y = val, group = key, color = key)) +
+    geom_point() +
+    geom_line() +
+    theme_bw() +
+    scale_x_continuous()
+```
